@@ -30,17 +30,13 @@
       xhr.setRequestHeader('Content-Type', 'application/json');
       xhr.send(JSON.stringify({ x, y }));
 
-      // Retrieve the updated data from Flask
-      drawGraph();
+      // Retrieve the updated data from Flask and redraw the graph
+      updateData();
     };
 
-    function drawGraph(xData, yData) {
-      context.lineWidth = 1;
-      console.log('xdata', xData);
-      console.log('ydata', yData);
+    function drawGraph() {
       context.clearRect(0, 0, canvas.width, canvas.height);
 
-      context.strokeStyle = '#000'
       // Draw the x-axis
       context.beginPath();
       context.moveTo(20, canvas.height / 2);
@@ -57,39 +53,39 @@
       context.fillStyle = '#ff0000'; // Red color
       for (const point of points) {
         context.beginPath();
-        context.arc(point.x, point.y, 1, 0, 2 * Math.PI);
+        context.arc(point.x, point.y, 3, 0, 2 * Math.PI);
         context.fill();
       }
-
-      // Draw the line
-      context.strokeStyle = '#0000ff'; // Blue color
-      context.lineWidth = 2; // Line width in pixels
-      context.beginPath();
-      context.moveTo(xData[0], canvas.height / 2 - yData[0]);
-      for (let i = 1; i < xData.length; i++) {
-        context.lineTo(xData[i], canvas.height / 2 - yData[i]);
-      }
-      context.stroke();
     }
-// TODO: This updateData thing throws errors on the app because it asks for stuff
-// that the app doesn't have yet. I need to figure out how to only update it if
-// the graph has been clicked
+
     function updateData() {
       const xhr = new XMLHttpRequest();
       xhr.open('GET', '/get_data');
       xhr.onreadystatechange = function() {
         if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
           const data = JSON.parse(xhr.responseText);
-          const xData = data.x_data - rect.left;
-          const yData = data.y_data - rect.top;
-          drawGraph(xData, yData);
+          const xData = data.x_data;
+          const yData = data.y_data;
+          drawGraph(); // Redraw the graph with points
+          drawLine(xData, yData); // Draw the line
         }
       };
       xhr.send();
     }
 
+    function drawLine(xData, yData) {
+      context.strokeStyle = '#0000ff'; // Blue color
+      context.lineWidth = 2; // Line width in pixels
+      context.beginPath();
+      context.moveTo(xData[0], yData[0]);
+      for (let i = 1; i < xData.length; i++) {
+        context.lineTo(xData[i], yData[i]);
+      }
+      context.stroke();
+    }
+
     // Initial draw
-    updateData();
+    drawGraph();
   </script>
 </body>
 </html>
