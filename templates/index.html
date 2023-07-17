@@ -9,8 +9,15 @@
   </style>
 </head>
 <body>
+  <h1>Realtime Polynomial Interpolation</h1>
   <canvas id="graphCanvas" width="400" height="300"></canvas>
-
+  <p>
+    Using scipy's BarycentricInterpolator class along with Chebyshev
+    zeros to avoid Runge's phenomenon, this simple app accepts user-clicked
+    points and then graphs a polynomial that interpolates all clicked points.
+    Soon functionality to choose whether or not chebyshev zeros are used will
+    be added to allow the user to explore Runge's phenomenon.
+  </p>
   <script>
     const canvas = document.getElementById('graphCanvas');
     const context = canvas.getContext('2d');

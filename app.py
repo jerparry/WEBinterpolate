@@ -1,22 +1,16 @@
-import matplotlib
-matplotlib.use('Agg')
 from flask import Flask, render_template, request, jsonify
-import matplotlib.pyplot as plt
 from scipy.interpolate import barycentric_interpolate
 import numpy as np
-import io
-import base64
 
 app = Flask(__name__)
 
 data_points = []  # Store the data points
-x_points = set()
+x_points = set() # Store x-coord of clicked points to avoid zero-divide
 
 @app.route('/')
 def index():
-    # get the points to interpolate
-    # not sure what this is even for lol
-
+    data_points.clear()  # empty list when page is loaded/refreshed
+    x_points.clear()
 
     return render_template('index.html',)
 
