@@ -10,6 +10,7 @@ import base64
 app = Flask(__name__)
 
 data_points = []  # Store the data points
+x_points = set()
 
 @app.route('/')
 def index():
@@ -27,8 +28,12 @@ def add_point():
     x = data['x']
     y = data['y']
 
-    # Add the data point to the list
-    data_points.append((x, y))
+    # Add the data point to the list, if the x hasn't already been clicked
+    if x not in x_points: # makes sure no divide by zero errors occur.
+        data_points.append((x, y))
+        x_points.add(x)
+    else:
+        pass
 
     return 'OK'
 
