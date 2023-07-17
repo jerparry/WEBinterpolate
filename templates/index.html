@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Graph Example</title>
+  <style>
+    canvas {
+      border: 1px solid #000;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="graphCanvas" width="400" height="300"></canvas>
+
+  <script>
+    const canvas = document.getElementById('graphCanvas');
+    const context = canvas.getContext('2d');
+    const points = [];
+
+    canvas.onclick = function(event) {
+      const rect = canvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+
+      // Store the clicked point
+      points.push({ x, y });
+
+      // Send the clicked coordinates to the Flask app
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '/add_point');
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.send(JSON.stringify({ x, y }));
+
+      // Retrieve the updated data from Flask
+      drawGraph();
+    };
+
+    function drawGraph(xData, yData) {
+      context.lineWidth = 1;
+      console.log('xdata', xData);
+      console.log('ydata', yData);
+      context.clearRect(0, 0, canvas.width, canvas.height);
+
+      context.strokeStyle = '#000'
+      // Draw the x-axis
+      context.beginPath();
+      context.moveTo(20, canvas.height / 2);
+      context.lineTo(canvas.width - 20, canvas.height / 2);
+      context.stroke();
+
+      // Draw the y-axis
+      context.beginPath();
+      context.moveTo(canvas.width / 2, 20);
+      context.lineTo(canvas.width / 2, canvas.height - 20);
+      context.stroke();
+
+      // Draw the data points
+      context.fillStyle = '#ff0000'; // Red color
+      for (const point of points) {
+        context.beginPath();
+        context.arc(point.x, point.y, 1, 0, 2 * Math.PI);
+        context.fill();
+      }
+
+      // Draw the line
+      context.strokeStyle = '#0000ff'; // Blue color
+      context.lineWidth = 2; // Line width in pixels
+      context.beginPath();
+      context.moveTo(xData[0], canvas.height / 2 - yData[0]);
+      for (let i = 1; i < xData.length; i++) {
+        context.lineTo(xData[i], canvas.height / 2 - yData[i]);
+      }
+      context.stroke();
+    }
+// TODO: This updateData thing throws errors on the app because it asks for stuff
+// that the app doesn't have yet. I need to figure out how to only update it if
+// the graph has been clicked
+    function updateData() {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', '/get_data');
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+          const data = JSON.parse(xhr.responseText);
+          const xData = data.x_data - rect.left;
+          const yData = data.y_data - rect.top;
+          drawGraph(xData, yData);
+        }
+      };
+      xhr.send();
+    }
+
+    // Initial draw
+    updateData();
+  </script>
+</body>
+</html>
