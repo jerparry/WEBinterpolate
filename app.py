@@ -6,6 +6,7 @@ app = Flask(__name__)
 
 data_points = []  # Store the data points
 x_points = set() # Store x-coord of clicked points to avoid zero-divide
+cheby = True
 
 @app.route('/')
 def index():
@@ -39,12 +40,21 @@ def get_data():
     xi = np.array([d[0] for d in data_points])
     yi = np.array([d[1] for d in data_points])
     j = np.arange(101)
-    xch = np.cos(j*np.pi/100) * 200 + 200
+    if cheby:
+        xch = np.cos(j*np.pi/100) * 200 + 200
+    else:
+        xch = np.linspace(0,400,101)
     ych = barycentric_interpolate(xi, yi, xch)
 
     return jsonify({'x_data': xch.tolist(), 'y_data': ych.tolist()})
 
 
+@app.route('/modify_zeros', methods=['POST'])
+def modify_zeros():
+    cheby = bool(int(request.form['zeros']))
+    index()
+
+    return 'OK'
 
 if __name__ == '__main__':
     app.debug = True

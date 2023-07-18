@@ -15,9 +15,21 @@
     Using scipy's BarycentricInterpolator class along with Chebyshev
     zeros to avoid Runge's phenomenon, this simple app accepts user-clicked
     points and then graphs a polynomial that interpolates all clicked points.
-    Soon functionality to choose whether or not chebyshev zeros are used will
-    be added to allow the user to explore Runge's phenomenon.
+    To change it, click a button below to use uniformly spaced points instead.
   </p>
+
+  <form action='/modify_zeros' method='POST'>
+
+    <input type="radio" name="zeros" value="1" id="cheby-zeros">
+    <label for="cheby-zeros">Chebyshev Zeros</label>
+
+    <input type="radio" name="zeros" value="0" id="unif-spaced">
+    <label for="unif-spaced">Uniformly Spaced</label>
+
+    <button type="submit">Submit</button>
+
+  </form>
+
   <script>
     const canvas = document.getElementById('graphCanvas');
     const context = canvas.getContext('2d');
